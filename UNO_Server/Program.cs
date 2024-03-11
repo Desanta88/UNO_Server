@@ -61,15 +61,16 @@ namespace UNO_Server
             int nClient = 0;
             string username = "";
             TcpClient Client = new TcpClient();
-            TcpListener server = new TcpListener(porta);
+            //TcpListener server = new TcpListener(porta);
+            Server server = new Server(porta);
             server.Start();
-            Console.WriteLine("server in ascolto");
+            //Console.WriteLine("server in ascolto");
             NetworkStream ns;
             Dictionary<int, TcpClient> giocatori = new Dictionary<int, TcpClient>();
             Dictionary<int, string> usernames = new Dictionary<int, string>();
             HandleClient h=new HandleClient();
             int clientId = 0;
-            while (nClient <= 2)
+            /*while (nClient <= 2)
             {
                 if (nClient != 2)
                 {
@@ -84,7 +85,7 @@ namespace UNO_Server
                     username = ricevuto;
                     usernames.Add(clientId, username);
                     Byte[] SendBytes = Encoding.ASCII.GetBytes("sei connesso");
-                    ns.Write(SendBytes, 0, SendBytes.Length);
+        
                    
                     var port = ((IPEndPoint)Client.Client.RemoteEndPoint).Port;
 
@@ -128,10 +129,11 @@ namespace UNO_Server
 
                     }
                 }
-            }
-            Console.WriteLine("Raggiunto il numero di client massimi");
-            server.Stop();
-            Console.WriteLine("Chiuso server");
+            }*/
+            
+            //Console.WriteLine("Raggiunto il numero di client massimi");
+            //server.Stop();
+            //Console.WriteLine("Chiuso server");
 
 
         }
