@@ -93,15 +93,15 @@ namespace UNO_Server
         }
         public string GetCardCodes(int nc)
         {
-            string[] simboli = new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "r", "s"};
-            string[] colori = new string[] { "y", "g", "b", "re", "cc" };
+            string[] simboli = new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "r", "s","p2"};
+            string[] colori = new string[] { "y", "g", "b", "re", "cc","p4" };
             string codes = "";
             Random r = new Random();
             for (int i = 0; i < nc; i++)
             {
                 int nSimbolo = r.Next(0, simboli.Length);
                 int nColore = r.Next(0, colori.Length);
-                if (colori[nColore] == "cc")
+                if (colori[nColore] == "cc" || colori[nColore] == "p4")
                 {
                     codes += colori[nColore] + ":" + colori[nColore];
                     if (i < nc - 1)
