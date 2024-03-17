@@ -16,6 +16,7 @@ namespace UNO_Server
         Dictionary<int, string> Usernames = new Dictionary<int, string>();
         private int clientCount;
         private string CurrentCard;
+        private List<Thread> listT = new List<Thread>();
 
         public Server(int port)
         {
@@ -26,7 +27,7 @@ namespace UNO_Server
         public void Start()
         {
             listener.Start();
-            Console.WriteLine("Server is listening for clients...");
+            Console.WriteLine("Server in ascolto");
 
             while (clientCount<2)
             {
@@ -38,11 +39,12 @@ namespace UNO_Server
                 ns.Read(ReceiveBytes, 0, client.ReceiveBufferSize);
                 string username = Encoding.ASCII.GetString(ReceiveBytes).Replace("\0", "");
                 Usernames.Add(clientCount, username);
-                Console.WriteLine("Client connected.");
+                Console.WriteLine("Client connesso con username "+username);
                 Byte[] SendBytes = Encoding.ASCII.GetBytes("sei connesso");
                 ns.Write(SendBytes, 0, SendBytes.Length);
 
                 Thread clientThread = new Thread(() => HandleClient(client));
+                listT.Add(clientThread);
                 clientThread.Start();
             }
             if (clientCount == 2)
@@ -51,6 +53,7 @@ namespace UNO_Server
                 int PrimoTurno = rId.Next(1, 3);
                 string user = Usernames[PrimoTurno];
                 CurrentCard = GetNeutralCard();
+                Console.WriteLine("Inizio partita");
                 BroadcastMessage($"start;{CurrentCard};{user}");
             }
         }
@@ -65,10 +68,12 @@ namespace UNO_Server
                 while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
                 {
                     string receivedMessage = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine($"Received from client: {receivedMessage}");
-                    if(receivedMessage=="Hai vinto!!!")
+                    Console.WriteLine($"Ricevuto dal client({receivedMessage.Split(';')[1]}): {receivedMessage}");
+                    if(receivedMessage.Contains("winner")==true)
                     {
+                        Console.WriteLine($"il giocatore {receivedMessage.Split(':')[0]} ha vinto!");
                         BroadcastMessage(receivedMessage);
+                        EndThreads();
                         listener.Stop();
                         Environment.Exit(0);
                     }
@@ -85,6 +90,13 @@ namespace UNO_Server
                 NetworkStream stream = client.GetStream();
                 Byte[] messageBytes = Encoding.ASCII.GetBytes(message);
                 stream.Write(messageBytes, 0, message.Length);
+            }
+        }
+        private void EndThreads()
+        {
+            for(int i = 0; i < listT.Count; i++)
+            {
+                listT[i].Abort();
             }
         }
         public int GetClientCount
